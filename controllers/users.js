@@ -73,3 +73,23 @@ export const addRemoveFriend = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
+export const findUser = async (req, res) => {
+  try {
+    const { text } = req.query;
+    console.log(text);
+    const user = await User.find({
+      $or: [
+        { firstName: { $regex: text, $options: "i" } },
+        { lastName: { $regex: text, $options: "i" } },
+      ],
+    });
+    const formatedUser = user.map(
+      ({ _id, firstName, lastName, picturePath, location }) => {
+        return { _id, firstName, lastName, picturePath, location };
+      }
+    );
+    res.status(200).json(formatedUser);
+  } catch (error) {
+    res.status(404).json({ message: "Пользователь не найден" });
+  }
+};
